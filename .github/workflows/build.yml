@@ -14,6 +14,9 @@ jobs:
         with:
           dotnet-version: '9.0.x'
       - run: dotnet build LaptopBar.csproj -c Release
+      - name: Installer behavior tests
+        shell: pwsh
+        run: ./tests/installer-tests.ps1
       - name: WPF and behavior smoke tests
         shell: pwsh
         run: |

@@ -1,0 +1,51 @@
+name: Publish Windows installer package
+on:
+  push:
+    tags:
+      - 'v*'
+permissions:
+  contents: write
+jobs:
+  release:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+      - name: Publish standalone Windows x64 app
+        run: dotnet publish LaptopBar.csproj -c Release -r win-x64 --self-contained true -o publish -p:PublishSingleFile=false
+      - name: Installer behavior tests
+        shell: pwsh
+        run: ./tests/installer-tests.ps1
+      - name: Test published app
+        shell: pwsh
+        run: |
+          $app = Join-Path $PWD 'publish/LaptopBar.exe'
+          $process = Start-Process $app -ArgumentList '--smoke-test' -WindowStyle Hidden -PassThru
+          if (-not $process.WaitForExit(60000)) { $process.Kill(); throw 'Smoke test timed out' }
+          if ($process.ExitCode -ne 0) { throw 'Smoke test failed' }
+          foreach ($report in @('ui-test.txt','popup-gpu-test.txt','layout-test.txt')) {
+            $text = Get-Content "publish/verification/$report" -Raw
+            Write-Output $text
+            if (-not $text.StartsWith('PASS:')) { throw "Failed: $report" }
+          }
+      - name: Package and test installer
+        shell: pwsh
+        run: |
+          Copy-Item THIRD-PARTY-NOTICES.txt publish/
+          Copy-Item README.md publish/
+          # Keep generated reports, preferences and symbols out of the distribution.
+          New-Item -ItemType Directory -Path package | Out-Null
+          Get-ChildItem publish -Force | Where-Object { $_.Name -notin @('verification','settings.json') -and $_.Extension -ne '.pdb' } | Copy-Item -Destination package -Recurse
+          Compress-Archive -Path package/* -DestinationPath LaptopBar-win-x64.zip
+          $hash = (Get-FileHash LaptopBar-win-x64.zip -Algorithm SHA256).Hash.ToLowerInvariant()
+          Set-Content SHA256SUMS.txt "$hash  LaptopBar-win-x64.zip" -Encoding ascii
+          ./install.ps1 -ArchivePath "$PWD/LaptopBar-win-x64.zip" -InstallDir "$PWD/install-test" -SkipRegistration -NoStart
+          if (-not (Test-Path install-test/LaptopBar.exe)) { throw 'Installer failed' }
+      - name: Create release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: pwsh
+        run: |
+          gh release create $env:GITHUB_REF_NAME LaptopBar-win-x64.zip SHA256SUMS.txt install.ps1 --title "LaptopBar $env:GITHUB_REF_NAME" --notes "Standalone Windows x64 app with .NET included. install.ps1 installs to LocalAppData and registers Start menu search plus login startup. Local models are not downloaded or started."

@@ -6,3 +6,6 @@ obj/
 settings.json
 verification/
 *.zip
+publish/
+install-test/
+SHA256SUMS.txt
