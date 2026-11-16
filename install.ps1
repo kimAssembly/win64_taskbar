@@ -64,7 +64,7 @@ try {
         $shortcut.Save()
         if (-not $NoStartup) {
             $runKey = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Run'
-            New-Item -Path $runKey -Force | Out-Null
+            if (-not (Test-Path -LiteralPath $runKey)) { New-Item -Path $runKey | Out-Null }
             New-ItemProperty -Path $runKey -Name LaptopBar -Value ('"' + $target + '"') -PropertyType String -Force | Out-Null
         }
         Write-Host 'Start menu search: LaptopBar'
