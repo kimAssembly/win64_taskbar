@@ -1,0 +1,16 @@
+<Window x:Class="LaptopBar.SettingsWindow" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Title="LaptopBar · Settings" Width="310" Height="504" WindowStyle="None" ResizeMode="NoResize" AllowsTransparency="True" Background="Transparent" ShowInTaskbar="False" Topmost="True" FontFamily="Segoe UI" FontSize="12">
+ <Border Padding="20" CornerRadius="16" Background="#F51C1933" BorderBrush="#635E92" BorderThickness="1"><StackPanel>
+  <DockPanel Margin="0,0,0,16"><Button Content="×" Click="ClosePanel" DockPanel.Dock="Right" Padding="7,0"/><TextBlock Text="WORKSPACE / SETTINGS" FontSize="10" Foreground="#C4BEF6" FontWeight="SemiBold"/></DockPanel>
+  <TextBlock Text="AI 표시" Foreground="#A49BC3" FontSize="10" Margin="0,0,0,10"/>
+  <StackPanel Orientation="Horizontal" Margin="0,0,0,17"><CheckBox x:Name="QwenCheck" Content="Qwen" Foreground="#EAE3FF" Margin="0,0,16,0" Checked="ModelsChanged" Unchecked="ModelsChanged"/><CheckBox x:Name="OssCheck" Content="Oss" Foreground="#EAE3FF" Margin="0,0,16,0" Checked="ModelsChanged" Unchecked="ModelsChanged"/><CheckBox x:Name="GptCheck" Content="GPT" Foreground="#EAE3FF" Checked="ModelsChanged" Unchecked="ModelsChanged"/></StackPanel>
+  <Button x:Name="AutoHideButton" Click="ToggleAutoHide" Background="#302B51" Margin="0,0,0,7"/>
+  <DockPanel Margin="0,0,0,12"><TextBlock Text="숨기기 대기 시간" FontSize="10" Foreground="#A49BC3"/><StackPanel DockPanel.Dock="Right" Orientation="Horizontal" HorizontalAlignment="Right"><Button Content="−" Click="LessDelay" Padding="8,2"/><TextBlock x:Name="DelayText" Width="36" TextAlignment="Center"/><Button Content="+" Click="MoreDelay" Padding="8,2"/></StackPanel></DockPanel>
+  <Button x:Name="StartupButton" Click="ToggleStartup" Background="#302B51" Margin="0,0,0,7"/>
+  <Button x:Name="PinButton" Click="TogglePin" Background="#302B51" Margin="0,0,0,7"/>
+  <Button x:Name="MotionButton" Click="ToggleMotion" Background="#302B51" Margin="0,0,0,7"/>
+  <Button Content="↥    상단 중앙으로 복귀" Click="Recenter" Background="#302B51" Margin="0,0,0,7"/>
+  <Button Content="↗    GPT 앱 실행 파일 지정" Click="ChooseApp" Background="#302B51" Margin="0,0,0,7"/>
+  <TextBlock x:Name="GptHint" Text="ChatGPT 앱 자동 감지" FontSize="9" Foreground="#A49BC3" TextTrimming="CharacterEllipsis" Margin="2,0,0,12"/>
+  <Grid><Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition/></Grid.ColumnDefinitions><Button Content="숨기기" Click="HideBar" Background="#302B51" Margin="0,0,4,0"/><Button Grid.Column="1" Content="종료" Click="ExitBar" Background="#49334F" Margin="4,0,0,0"/></Grid>
+ </StackPanel></Border>
+</Window>
