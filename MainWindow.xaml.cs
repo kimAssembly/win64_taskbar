@@ -78,8 +78,8 @@ public partial class MainWindow : Window
             panel.InvalidateMeasure(); panel.Measure(new Size(double.PositiveInfinity,Height - 10));
             contents += panel.DesiredSize.Width;
         }
-        // Grid insets (24), frame (10), and a dedicated right gutter (24).
-        return Math.Max(280,Math.Min(Math.Ceiling(contents) + 58,available - 24));
+        // Grid insets (24), frame (10), and a small right gutter (8).
+        return Math.Max(280,Math.Min(Math.Ceiling(contents) + 42,available - 24));
     }
     internal void ApplyPreferences()
     {
@@ -285,11 +285,11 @@ public partial class MainWindow : Window
                 for (int gpu = 0; gpu < 2; gpu++) {
                     SetGpuDisplay(gpu == 1 ? (100,"layout_test") : null); UpdateLayout(); await System.Threading.Tasks.Task.Delay(40); UpdateLayout();
                     double right = SettingsButton.TranslatePoint(new Point(SettingsButton.ActualWidth,0),this).X;
-                    if (right > ActualWidth - 18) throw new InvalidOperationException($"Settings overflow: mask={mask}, GPU={gpu}, right={right}, window={ActualWidth}");
+                    if (right > ActualWidth - 10) throw new InvalidOperationException($"Settings overflow: mask={mask}, GPU={gpu}, right={right}, window={ActualWidth}");
                 }
             }
             if (SettingsButton.ToolTip != null || ConnectionsButton.ToolTip != null || RamText.ToolTip != null || BatteryText.ToolTip != null || GpuPanel.ToolTip != null) throw new InvalidOperationException("Unexpected main-bar tooltip");
-            File.WriteAllText(Path.Combine(folder,"layout-test.txt"),"PASS: settings button inside right edge with >=18 DIP clearance; 8 AI combinations x GPU present/absent; main-bar tooltips removed.");
+            File.WriteAllText(Path.Combine(folder,"layout-test.txt"),"PASS: settings button inside right edge with >=10 DIP clearance; 8 AI combinations x GPU present/absent; main-bar tooltips removed.");
         } catch(Exception ex) { File.WriteAllText(Path.Combine(folder,"layout-test.txt"),"FAIL: " + ex); }
         finally { prefs.ShowQwen = savedQwen; prefs.ShowOss = savedOss; prefs.ShowGpt = savedGpt; SetGpuDisplay(_gpu.Read()); ApplyPreferences(); }
         File.WriteAllText(Path.Combine(folder, "metrics.txt"), $"RAM={_metrics.UsedGb:F2}/{_metrics.TotalGb:F2} GB; battery={_metrics.Battery}; power={_metrics.PowerDetail}; DPI={VisualTreeHelper.GetDpi(this).PixelsPerDip}; width={Width}; appMB={Process.GetCurrentProcess().WorkingSet64 / 1048576.0:F1}");
